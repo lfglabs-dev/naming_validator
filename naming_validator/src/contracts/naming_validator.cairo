@@ -1,25 +1,29 @@
 #[contract]
-mod HelloStarknet {
+mod NamingValidator {
+
+    // Dispatchers
+    use naming_validator::interfaces::naming::NamingDispatcher;
+    use naming_validator::interfaces::naming::NamingDispatcherTrait;
+    use starknet::ContractAddress;
+    use traits::Into;
+    
     struct Storage {
-        balance: felt252,
+        naming_contract: ContractAddress,
     }
 
-    // Increases the balance by the given amount.
     #[external]
-    fn increase_balance(amount: felt252) {
-        assert(amount != 0, 'Amount cannot be 0');
-        balance::write(balance::read() + amount);
+    fn initializer(naming_contract: ContractAddress) {
+        if naming_contract::read().into() == 0 {
+            naming_contract::write(naming_contract);
+        }
     }
 
-    // Returns the current balance.
     #[view]
-    fn get_balance() -> felt252 {
-        balance::read()
+    fn assert_domain_to_address(domain: Array<felt252>, address: felt252) {
+        let expected_address = NamingDispatcher{
+            contract_address: naming_contract::read()
+        }.domain_to_address(domain);
+        assert(expected_address == address, 'unexpected domain target');
     }
 
-    // Calls a function defined in outside module
-    #[view]
-    fn get_two() -> felt252 {
-        naming_validator::business_logic::utils::returns_two()
-    }
 }

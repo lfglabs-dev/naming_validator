@@ -5,27 +5,15 @@ use result::ResultTrait;
 fn test_increase_balance() {
     let contract_address = deploy_contract('naming_validator', @ArrayTrait::new()).unwrap();
 
-    let result_before = call(contract_address, 'get_balance', @ArrayTrait::new()).unwrap();
-    assert(*result_before.at(0_u32) == 0, 'Invalid balance');
-
+    // initialization
     let mut invoke_calldata = ArrayTrait::new();
-    invoke_calldata.append(42);
-    invoke(contract_address, 'increase_balance', @invoke_calldata).unwrap();
+    invoke_calldata.append(0x06ac597f8116f886fa1c97a23fa4e08299975ecaf6b598873ca6792b9bbfb678);
+    invoke(contract_address, 'initializer', @invoke_calldata).unwrap();
 
-    let result_after = call(contract_address, 'get_balance', @ArrayTrait::new()).unwrap();
-    assert(*result_after.at(0_u32) == 42, 'Invalid balance');
-}
-
-#[test]
-fn test_cannot_increase_balance_with_zero_value() {
-    let contract_address = deploy_contract('naming_validator', @ArrayTrait::new()).unwrap();
-
-    let result_before = call(contract_address, 'get_balance', @ArrayTrait::new()).unwrap();
-    assert(*result_before.at(0_u32) == 0, 'Invalid balance');
-
-    let mut invoke_calldata = ArrayTrait::new();
-    invoke_calldata.append(0);
-    let invoke_result = invoke(contract_address, 'increase_balance', @invoke_calldata);
-
-    assert(invoke_result.is_err(), 'Invoke should fail');
+    // assertion
+    let mut calldata = ArrayTrait::new();
+    calldata.append(1);
+    calldata.append(33133781693);
+    calldata.append(0x00a00373A00352aa367058555149b573322910D54FCDf3a926E3E56D0dCb4b0c);
+    //call(contract_address, 'assert_domain_to_address', @ArrayTrait::new()).unwrap();
 }

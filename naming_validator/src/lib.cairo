@@ -1,2 +1,2 @@
-mod business_logic;
+mod interfaces;
 mod contracts;
